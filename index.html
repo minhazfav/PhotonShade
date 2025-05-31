@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Color ↔ [hv, s, l, a] Converter</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 2rem; background: #f9f9f9; }
+    label, input, select { display: block; margin-top: 1rem; }
+    .output { margin-top: 2rem; background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    input[type='color'] { width: 100px; }
+  </style>
+</head>
+<body>
+  <h2>Color ↔ [hv, s, l, a] Converter</h2>
+  
+  <label for="mode">Choose Input Type:</label>
+  <select id="mode">
+    <option value="hex">HEX</option>
+    <option value="rgba">RGBA</option>
+    <option value="physics">[hv, s, l, a]</option>
+  </select>
+
+  <div id="inputFields"></div>
+  <button onclick="convert()">Convert</button>
+
+  <div class="output" id="output"></div>
+
+  <script>
+    const inputFields = document.getElementById('inputFields');
+    const mode = document.getElementById('mode');
+
+    mode.addEventListener('change', updateInputs);
+    updateInputs();
+
+    function updateInputs() {
+      const type = mode.value;
+      if (type === 'hex') {
+        inputFields.innerHTML = `
+          <label>HEX Color: <input type="color" id="hexColor" value="#ff0000"></label>
+          <label>Opacity (%): <input type="number" id="hexAlpha" value="100" min="0" max="100"></label>
+        `;
+      } else if (type === 'rgba') {
+        inputFields.innerHTML = `
+          <label>R: <input type="number" id="r" value="255" min="0" max="255"></label>
+          <label>G: <input type="number" id="g" value="0" min="0" max="255"></label>
+          <label>B: <input type="number" id="b" value="0" min="0" max="255"></label>
+          <label>A (%): <input type="number" id="a" value="100" min="0" max="100"></label>
+        `;
+      } else if (type === 'physics') {
+        inputFields.innerHTML = `
+          <label>hv (eV): <input type="number" id="hv" value="2.2" step="0.01" min="1.6" max="3.1"></label>
+          <label>Saturation (%): <input type="number" id="sat" value="100" min="0" max="100"></label>
+          <label>Lightness (%): <input type="number" id="light" value="50" min="0" max="100"></label>
+          <label>Opacity (%): <input type="number" id="opa" value="100" min="0" max="100"></label>
+        `;
+      }
+    }
+
+    function convert() {
+      const type = mode.value;
+      let output = document.getElementById('output');
+      let result = {};
+
+      if (type === 'hex') {
+        const hex = document.getElementById('hexColor').value;
+        const alpha = parseFloat(document.getElementById('hexAlpha').value) / 100;
+        const r = parseInt(hex.substr(1,2), 16);
+        const g = parseInt(hex.substr(3,2), 16);
+        const b = parseInt(hex.substr(5,2), 16);
+        result = rgbaToPhysics(r, g, b, alpha);
+      }
+
+      else if (type === 'rgba') {
+        const r = parseInt(document.getElementById('r').value);
+        const g = parseInt(document.getElementById('g').value);
+        const b = parseInt(document.getElementById('b').value);
+        const a = parseFloat(document.getElementById('a').value) / 100;
+        result = rgbaToPhysics(r, g, b, a);
+      }
+
+      else if (type === 'physics') {
+        const hv = parseFloat(document.getElementById('hv').value);
+        const s = parseFloat(document.getElementById('sat').value);
+        const l = parseFloat(document.getElementById('light').value);
+        const a = parseFloat(document.getElementById('opa').value);
+        result = physicsToRGBA(hv, s, l, a);
+      }
+
+      output.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+    }
+
+    function rgbaToPhysics(r, g, b, a) {
+      r /= 255; g /= 255; b /= 255;
+      let [h, l, s] = rgbToHls(r, g, b);
+      let hue_deg = h * 360;
+      hue_deg = Math.min(300, Math.max(0, hue_deg));
+      let hv = 1.6 + (hue_deg / 300) * (3.1 - 1.6);
+      return {
+        "hv (eV)": hv.toFixed(3),
+        "Saturation (%)": (s * 100).toFixed(1),
+        "Lightness (%)": (l * 100).toFixed(1),
+        "Opacity (%)": (a * 100).toFixed(1)
+      };
+    }
+
+    function physicsToRGBA(hv, s, l, a) {
+      hv = Math.max(1.6, Math.min(3.1, hv));
+      let hue = ((hv - 1.6) / (3.1 - 1.6)) * 300 / 360;
+      s /= 100; l /= 100; a /= 100;
+      let [r, g, b] = hlsToRgb(hue, l, s);
+      return {
+        R: Math.round(r * 255),
+        G: Math.round(g * 255),
+        B: Math.round(b * 255),
+        A: parseFloat(a.toFixed(2))
+      };
+    }
+
+    function rgbToHls(r, g, b) {
+      let max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+      if(max == min){ h = s = 0; }
+      else {
+        let d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch(max){
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+      return [h, l, s];
+    }
+
+    function hlsToRgb(h, l, s) {
+      let r, g, b;
+      if(s === 0){ r = g = b = l; }
+      else {
+        const hue2rgb = (p, q, t) => {
+          if(t < 0) t += 1;
+          if(t > 1) t -= 1;
+          if(t < 1/6) return p + (q - p) * 6 * t;
+          if(t < 1/2) return q;
+          if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+        }
+        let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        let p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+      }
+      return [r, g, b];
+    }
+  </script>
+  <a href="/about.html">Read full article about this project</a>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About | PhotonShade</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 2rem; background: #f4f4f4; line-height: 1.7; color: #222; max-width: 800px; margin: auto; }
+    h1, h2, h3 { color: #022E63; }
+    h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+    h2 { font-size: 1.8rem; margin-top: 2rem; }
+    h3 { font-size: 1.4rem; margin-top: 1.5rem; }
+    code { background: #eee; padding: 0.2em 0.4em; border-radius: 4px; }
+    pre { background: #eee; padding: 1rem; border-radius: 4px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>About PhotonShade</h1>
+
+  <p><strong>PhotonShade</strong> is a physics-inspired web tool that bridges the world of <strong>light</strong>, <strong>color theory</strong>, and <strong>quantum mechanics</strong>. It allows you to convert between standard digital color formats like <code>HEX</code> and <code>RGBA</code>, and a custom physical model:</p>
+
+  <pre>Color ⇄ [hv (eV), Saturation %, Lightness %, Opacity %]</pre>
+
+  <p>This tool is built for:</p>
+  <ul>
+    <li>🎓 Educators exploring the physics of color</li>
+    <li>🎨 Designers curious about spectral purity</li>
+    <li>🧑‍🔬 Developers creating simulations or educational content</li>
+    <li>⚗️ Physicists visualizing Planck’s relation in a perceptual space</li>
+  </ul>
+
+  <h2>⚛️ Why Photon Energy?</h2>
+  <p>At the heart of color lies <strong>light</strong>, and at the heart of light lies <strong>photon energy</strong>, described by the famous equation:</p>
+  <pre>E = hv</pre>
+  <p>Where:</p>
+  <ul>
+    <li><code>E</code> is the energy of a photon,</li>
+    <li><code>h</code> is Planck’s constant,</li>
+    <li><code>v</code> is the frequency of light.</li>
+  </ul>
+  <p>In the visible spectrum, photon energies range from approximately:</p>
+  <ul>
+    <li><strong>1.6 eV</strong> (red light, ~700nm)</li>
+    <li>to <strong>3.1 eV</strong> (violet light, ~400nm)</li>
+  </ul>
+
+  <h2>🎨 How the Tool Works</h2>
+
+  <h3>1. Hue from Photon Energy</h3>
+  <p>We calculate hue based on <strong>physical energy</strong> instead of arbitrary angles:</p>
+  <pre>hue° = ((hv - 1.6) / (3.1 - 1.6)) × 300</pre>
+  <p>This ensures:</p>
+  <ul>
+    <li>hv = 1.6 → hue = 0° (Red)</li>
+    <li>hv = 3.1 → hue = 300° (Violet)</li>
+  </ul>
+  <p>The last 60° (300–360°) are reserved for synthetic, non-spectral colors like magenta.</p>
+
+  <h3>2. Saturation, Lightness, Opacity</h3>
+  <ul>
+    <li><strong>Saturation:</strong> 0% (gray) → 100% (fully vivid)</li>
+    <li><strong>Lightness:</strong> 0% (black) → 100% (white)</li>
+    <li><strong>Opacity:</strong> 0% (transparent) → 100% (opaque)</li>
+  </ul>
+
+  <h2>🔁 Bi-Directional Conversion</h2>
+  <ul>
+    <li><strong>HEX or RGBA → [hv, s, l, a]</strong>: See the energy equivalent of any digital color.</li>
+    <li><strong>[hv, s, l, a] → RGBA</strong>: Design colors using quantum rules.</li>
+  </ul>
+
+  <h2>🧪 Use Cases</h2>
+  <ul>
+    <li>Physics Teachers explaining light/energy relationships</li>
+    <li>Developers working on scientific or artistic simulations</li>
+    <li>Science Communicators and Color Researchers</li>
+    <li>Curious minds wanting to explore color differently</li>
+  </ul>
+
+  <h2>🌍 Philosophy</h2>
+  <p>Most digital colors are abstract approximations. PhotonShade grounds color in physical meaning — where hue is driven by photon energy, not just artistic interpretation.</p>
+  <p>It's not just for aesthetics — it's a tool for understanding and exploration.</p>
+
+  <h2>🧰 Tech Stack</h2>
+  <ul>
+    <li>Pure HTML + JavaScript</li>
+    <li>Client-side only — no dependencies</li>
+    <li>Framework-free, instant, lightweight</li>
+  </ul>
+
+  <h2>👤 Author</h2>
+  <p>Developed by <strong>Md Minhazul Abedin</strong><br>
+  Part of the <strong>Euler Developers</strong> ecosystem</p>
+
+  <h2>📜 License</h2>
+  <p>MIT License — free to use, extend, remix.</p>
+  <a href="/index.html">Back to the converter</a>
+</body>
+</html>
